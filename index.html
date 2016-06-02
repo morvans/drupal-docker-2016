@@ -1,50 +1,479 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+    <title>reveal.js</title>
 
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/black.css">
 
-		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/zenburn.css">
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
 
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
-			</div>
-		</div>
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
 
-		<script src="lib/js/head.min.js"></script>
-		<script src="js/reveal.js"></script>
 
-		<script>
-			// More info https://github.com/hakimel/reveal.js#configuration
-			Reveal.initialize({
-				history: true,
+        <section><h1>Drupal & Docker</h1>
+            <p>ou</p>
+            <h2>Drupal microservice</h2>
+            <h3>avec Docker</h3>
+        </section>
 
-				// More info https://github.com/hakimel/reveal.js#dependencies
-				dependencies: [
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
-					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
-				]
-			});
-		</script>
-	</body>
+        <section><h1>C'est qui ?</h1>
+        </section>
+
+        <section>
+            <section>
+                <h2>Docker</h2>
+                <aside class="notes">Docker est une solution de gestion de conteneur sous Linux</aside>
+            </section>
+            <section>
+                <em>Containers</em> Linux
+                <aside class="notes">Conteneur = &ldquo;Virtualisation l&eacute;g&egrave;re&rdquo;. Partage le m&ecirc;me
+                    noyau, isolation via les CGroups
+                </aside>
+            </section>
+            <section>
+                <h3>Les <em>CGroups</em></h3>
+                <p>
+                    <small>vus de très très haut</small>
+                </p>
+                <ul>
+                    <li>Processus (& IPC)</li>
+                    <li>Pile réseau</li>
+                    <li>Système de ficher (points de montage)</li>
+                    <li>Utilisateurs (uid et gid)</li>
+                    <li>Nom d'hôte</li>
+                </ul>
+                <aside class="notes">
+                    <ul>
+                        <li>Les Cgroups (rapidement)</li>
+                        <li>Process (+IPC) =&gt; ps output in et out</li>
+                        <li>Network stack =&gt; ifconfig in et out</li>
+                        <li>Filesystem/Mouts =&gt; </li>
+                        <li>Users =&gt; getent passwd in et out</li>
+                        <li>Hostname</li>
+                    </ul>
+                </aside>
+            </section>
+            <section>
+                <p>Isolation similaire à une virtualisation d'OS,<br><span
+                        class="fragment">partageant un même noyau</span><br>
+                    <span class="fragment">et un peu complexe à mettre en oeuvre sans outillage.</span></p>
+                <aside class="notes">
+                    Cgroups conclusion =&gt; VM l&eacute;g&egrave;re<
+                </aside>
+            </section>
+            <section>Docker<br>
+                <small>pour simplifier :</small>
+                <br>&ldquo;une boîte &agrave; outils pour les CGroups Linux&rdquo;</span></section>
+
+        </section>
+
+        <section>
+            <section>
+                <h2>Notion fondamentale #1</h2>
+                <h3 class="fragment">Les images</h3>
+            </section>
+
+            <section>
+                <h3>Image docker</h3>
+                <ul>
+                    <li class="fragment">Le système de fichier du container</li>
+                    <li class="fragment">L'application et toutes ses dépendances</li>
+                </ul>
+                <aside class="notes">
+                    <ul>
+                        <li>Image docker = &ldquo;Filesystem de boot&rdquo; du container</li>
+                        <li>Image docker = &ldquo;Une application et toutes ses d&eacute;pendances&rdquo;
+                            (OS+Libs/Deps+App)
+                        </li>
+                    </ul>
+                </aside>
+            </section>
+
+            <section>
+
+                <h3>De l'image au container</h3>
+                <ul>
+                    <li class="fragment">Démarrage</li>
+                    <li class="fragment">Arrêt</li>
+                    <li class="fragment">Redémarrage</li>
+                    <li class="fragment">Suppression</li>
+                </ul>
+                <p class="fragment">Un container docker se comporte comme une machine virtuelle éphémère.</p>
+
+                <aside class="notes">
+                    <span>Un containeur peut etre stopp&eacute;/red&eacute;marr&eacute;. Il reste sur la m&ecirc;me image de base et conserve les modifications.</span>
+                    <span>D&eacute;marrer sur une nouvelle image (ex upgrade de l&rsquo;application) = perte des modifications effectu&eacute;es sur la base de l&rsquo;ancienne image.</span>
+
+                    <span>Il faut voir un conteneur docker comme une VM &eacute;ph&eacute;m&egrave;re</span>
+                </aside>
+            </section>
+
+
+            <section>
+
+                <h3>Fabriquer une image</h3>
+                <aside class="notes">
+                    A DISPATCHER
+                    Fabrication d&rsquo;une image : analogue &agrave; un script de d&eacute;ploiement : les Dockerfile
+                    Image nomm&eacute;e</span> Une image a un identifiant unique et peut avoir un nom
+                    Registry : push/pull
+                </aside>
+            </section>
+
+            <section>
+
+                <h3>Recette éternelle</h3>
+
+                <ul>
+                    <li class="fragment">Choix de l'OS</li>
+                    <li class="fragment">Installation des dépendances</li>
+                    <li class="fragment">Déploiement de l'application</li>
+                </ul>
+            </section>
+
+            <section>
+
+                <h3>Automatisation : Dockerfile</h3>
+
+                <ul>
+                    <li class="fragment">Analogue à un script shell</li>
+                    <li class="fragment">Et des optimisations (cache)</li>
+                </ul>
+            </section>
+
+            <section>
+
+                <h3>Distribution des images</h3>
+
+                <ul>
+                    <li class="fragment">Nom</li>
+                    <li class="fragment">Registry</li>
+                </ul>
+            </section>
+
+
+        </section>
+
+
+        <section>
+            <section>
+                <h2>Notion fondamentale #2</h2>
+                <h3 class="fragment">Les volumes</h3>
+            </section>
+
+            <section>
+
+                <p>Les données générée par un container docker<br>ne sont pas persistantes.</p>
+                <p class="fragment">A moins d'être stockées dans un volume.</p>
+
+            </section>
+
+            <aside class="notes">
+                Docker stocke les modifications que le conteneur apporte à l'image de démarrage dans un espace qui
+                est supprimé lorsque le conteneur est recréé. Une mise à jour = une recréation du conteneur.
+            </aside>
+
+            <section>
+
+                <p>Un volume docker est un point de montage<br>externe au container</p>
+
+                <p class="fragment">Par défaut, associé à un répertoire de l'hôte Docker</p>
+
+                <p class="fragment">Plugin additionnels : Ceph, Gluster, Flocker, ...</p>
+
+
+                <aside class="notes">
+
+                    Stockage p&eacute;r&egrave;ne : les volumes. Dossier de stockage (montage) externe &agrave;
+                    l&rsquo;image, qui persiste si le conteneur est supprim&eacute;
+                    et qui peut &ecirc;tre attach&eacute; &agrave; un nouveau conteneur : solution pour les donn&eacute;es
+                    persistentes de l&rsquo;application.
+
+                    Associ&eacute; &agrave; un r&eacute;pertoire sur l&rsquo;h&ocirc;te
+
+                    Ou plugins : Ceph, Gluster, Flocker?
+
+                </aside>
+
+            </section>
+
+        </section>
+
+        <section>
+
+            <section>
+                <h3>Philosophie micro-service et docker</h3>
+            </section>
+
+            <section>
+                <span>D&eacute;couper : un service = un containeur; un container = un processus</span></section>
+            <section><span>Avis personnel : &eacute;viter les gestionnaires de processus </span></section>
+        </section>
+        <section>
+            <section><span>Exception : image &ldquo;turnkey&rdquo;
+                type Gitlab (HTTP, GIT, SSH, &hellip;)</span></section>
+            <section><span>Exception gitlab : mais postgresql, redis, &hellip; restent externes.</span>
+            </section>
+        </section>
+        <section>
+            <section><span>Le r&eacute;seau docker en bref</span></section>
+        </section>
+        <section>
+            <section><span>Docker networks =&gt; un /24</span></section>
+            <section><span>Docker assigne une IP automatiquement &agrave;
+                chaque container (random!)</span></section>
+            <section><span>Port mapping sur l&rsquo;host</span></section>
+        </section>
+        <section>
+            <section><span>Drupal (point de vue &ldquo;Ops&rdquo;)</span></section>
+        </section>
+        <section>
+            <section><span>Une application comme un autre :</span></section>
+        </section>
+        <section>
+            <section><span>Du code</span></section>
+            <section><span>Des datas</span></section>
+            <section><span>Des services externes</span></section>
+        </section>
+        <section>
+            <section><span>S&eacute;paration des services : mysql (ou autre) n&rsquo;est pas consid&eacute;r&eacute;
+                dans l&rsquo;image</span></section>
+        </section>
+        <section>
+            <section><span>Service manag&eacute;, Cluster traditionnel ou conteneur &agrave;
+                cot&eacute;</span></section>
+        </section>
+        <section>
+            <section><span>Le code</span></section>
+        </section>
+        <section>
+            <section>
+                <span>Bundle &ldquo;base (OS), libs &amp; programmes (Apache, PHP, &hellip;), le code PHP</span>
+            </section>
+            <section><span>Dockerfile</span></section>
+        </section>
+        <section>
+            <section><span>Les datas</span></section>
+        </section>
+        <section>
+            <section><span>Traditionnellement Drupal utilise directment le filesystem vu par PHP</span>
+            </section>
+            <section><span>Volumes : sites/default/{files,private}</span></section>
+        </section>
+        <section>
+            <section><span>En pratique :</span></section>
+        </section>
+        <section>
+            <section><span>Le dockefile</span></section>
+            <section><span>G&eacute;rer la stack compl&egrave;te : docker-compose</span></section>
+            <section><span>Services suppl&eacute;mentaires : memcache, solr, varnish, &hellip;</span></section>
+        </section>
+        <section>
+            <section><span>Les d&eacute;pendences du code non versionn&eacute;es</span></section>
+        </section>
+        <section>
+            <section><span>Composer, Drush make, &hellip;</span></section>
+            <section><span>Exemple avec D8 et composer</span></section>
+        </section>
+        <section>
+            <section><span>La configuration (settings.php)</span></section>
+        </section>
+        <section>
+            <section><span>Injecter la configuration via les volumes</span></section>
+        </section>
+        <section>
+            <section><span>Consid&eacute;rer que les datas d&rsquo;un environnement sont l&rsquo;ensemble du r&eacute;pertoire sites/default, configuraiton comprise</span>
+            </section>
+            <section>
+                <span>Semple plus facile (un settings.php diff&eacute;rent par environneent, avec la meme image)</span>
+            </section>
+            <section><span>Fastidieux &agrave; d&eacute;ployer et maintenir </span></section>
+        </section>
+        <section>
+            <section><span>12-factors ! </span></section>
+        </section>
+        <section>
+            <section><span>Utiliser les variables d&rsquo;environnement</span></section>
+            <section><span>Docker networks : discovery des containers</span></section>
+            <section><span>Settings.php + getenv() + docker-compose.yml</span></section>
+            <section><span>Pour les particularit&eacute;s de l&rsquo;environnement : include d&rsquo;un .php mont&eacute;
+                via un volume&hellip; ou juste les variables d&rsquo;environnement</span></section>
+        </section>
+        <section>
+            <section><span>Exploiter docker en developpement</span></section>
+        </section>
+        <section>
+            <section><span>Notion de couches dans les images</span></section>
+            <section><span>Chaque ligne du dockerfile est une couche</span></section>
+            <section><span>S&eacute;parer le commun du sp&eacute;cifique : fabriquer sa propre image de base</span>
+            </section>
+            <section>
+						<span>En d&eacute;veloppement, on utilise directement l&rsquo;image de base en &ldquo;montant&rdquo;
+                            les sources via un volume</span></section>
+            <section><span>Drush, composer, grunt, whateverthefucknewfrontendtool =&gt; install&eacute;
+                dans l&rsquo;image de base (puisque n&eacute;cessaire pour fabriquer le projet, cf. l&rsquo;exemple pr&eacute;c&eacute;dent) et execut&eacute;
+                dans le container</span></section>
+        </section>
+        <section>
+            <section><span>B&eacute;n&eacute;fices :</span></section>
+        </section>
+        <section>
+            <section><span>Parit&eacute; REELLE developpeur/test/staging/prod</span></section>
+        </section>
+        <section>
+            <section><span>Ref git =&gt; image docker qui part en test et qui peut ensuite partir en prod</span>
+            </section>
+            <section><span>N&rsquo;emp&ecirc;che pas &eacute;galement de travailler avec des branches git (master/develop) si on pr&eacute;f&egrave;re</span>
+            </section>
+        </section>
+        <section>
+            <section><span>D&eacute;ploiement initial simplifi&eacute; (pas d&rsquo;outils &agrave;
+                installer ni sur la station de dev, ni sur les serveurs de prod)</span></section>
+            <section><span>Gestion des D&eacute;pendances conflictuelles entre projets</span></section>
+        </section>
+        <section>
+            <section><span>Version de PHP : Migration php 7 ?</span></section>
+            <section><span>Outils syst&egrave;mes (imagemagick, ffmpeg)</span></section>
+        </section>
+        <section>
+            <section><span>D&eacute;ploiement identique pour tous les projets</span></section>
+        </section>
+        <section>
+            <section><span>Docker build</span></section>
+            <section><span>Docker push</span></section>
+            <section><span>Docker-compose pull</span></section>
+            <section><span>Docker-compose up -d</span></section>
+            <section><span>(Docker-compoe exec drush updb)</span></section>
+        </section>
+        <section>
+            <section><span>Immuable, Rollback</span></section>
+        </section>
+        <section>
+            <section><span>Composer install / npm install sur un ancien tag du projet</span></section>
+        </section>
+        <section>
+            <section><span>Lib manquantes</span></section>
+            <section><span>Repositories innaccessibles</span></section>
+        </section>
+        <section>
+            <section><span>Limites et inconv&eacute;nients</span></section>
+        </section>
+        <section>
+            <section><span>D&eacute;ploiement multihosts / HA (S3?)</span></section>
+            <section><span>Gestion de la s&eacute;curit&eacute; des images (patchs syst&egrave;mes)</span>
+            </section>
+        </section>
+        <section>
+            <section><span>Aller plus loin</span></section>
+        </section>
+        <section>
+            <section><span>HA ? Pr&eacute;sentation ax&eacute;
+                sur un seul host docker. En production : du multi host</span>
+            </section>
+        </section>
+        <section>
+            <section><span>Un cluster docker : swarm : un cluster de serveurs docker vu comme un unique serveur. Docker-compose.yml + swarm. Utiliser un r&eacute;seau de type overlay. </span>
+            </section>
+            <section><span>Kubernetes : notion de pods et de service =&gt; philosophie de dockerfile pouss&eacute;e plus loin. Gestion des IPs, du load balancing</span>
+            </section>
+        </section>
+        <section>
+            <section><span>Kubernetes host&eacute; : GCE pratique pour tester kubernetes avant si envie de le d&eacute;ployer en propre</span>
+            </section>
+        </section>
+        <section>
+            <section><span>Offre de conteneurs Amazon (pas test&eacute;)</span></section>
+            <section><span>Probl&eacute;matique commune &agrave; toute solution de clusting docker : le stockage partag&eacute;
+                de sites/default/files : pas tellement d&rsquo;autres solution qu&rsquo;un traditionnel FS partag&eacute;
+                (NFS, glusterfs) entre tous les noeuds du cluster</span></section>
+        </section>
+        <section>
+            <section><span>Le stockage des fichiers : en faire un service externe, comme mysql</span></section>
+        </section>
+        <section>
+            <section><span>Module &ldquo;S3&rdquo; pour remplacer sites/default/files</span></section>
+            <section><span>Backend AWS ou autre cloud, cluster Ceph ou Swift en propre, &hellip;</span>
+            </section>
+            <section><span>Rendre l&rsquo;ex&eacute;cution de l&rsquo;application compl&egrave;tement ind&eacute;pendante de l&rsquo;host d&rsquo;ex&eacute;cution</span>
+            </section>
+        </section>
+        <section>
+            <section><span>S&eacute;paration Apache/NGinx et PHP-FPM en deux containers distincts</span>
+            </section>
+        </section>
+        <section>
+            <section><span>Probl&eacute;matique de gestion du code source en double</span></section>
+        </section>
+        <section>
+            <section>
+                <span>Utiliser une image sp&eacute;cialis&eacute;e pour une phase de build s&eacute;par&eacute;e</span>
+            </section>
+        </section>
+        <section>
+            <section><span>Faire tourner composer install / drush make (et grunt/gulp/whatever) dans un container s&eacute;par&eacute;, &agrave;
+                partir d&rsquo;une image d&eacute;di&eacute;e, pour pr&eacute;parer les sources avant le docker build</span>
+            </section>
+            <section><span>Exemple</span></section>
+        </section>
+        <section>
+            <section><span>MacOS ? Windows ?</span></section>
+        </section>
+        <section>
+            <section><span>Solution &ldquo;historique&rdquo; : VM Linux Vagrant avec docker + partage d&rsquo;un dossier racine</span>
+            </section>
+            <section>
+                <span>Puis docker toolbox (package VirtualBox, boot2docker + binaires natifs du client docker)</span>
+            </section>
+            <section><span>R&eacute;cemments : solution &agrave; base d&rsquo;unikernels = noyeau linux stripped down + daemon docker instanci&eacute;
+                comme un programme natif, via la couche hyperviseur de l&rsquo;OS (OSX El Capitan, Windows 10 uniquement)</span>
+            </section>
+        </section>
+        <section>
+            <section><span>Questions</span></section>
+        </section>
+        <p><span></span></p>
+
+        </section>
+
+    </div>
+</div>
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.js"></script>
+
+<script>
+    // More info https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        history: true,
+
+        // More info https://github.com/hakimel/reveal.js#dependencies
+        dependencies: [
+            {src: 'plugin/markdown/marked.js'},
+            {src: 'plugin/markdown/markdown.js'},
+            {src: 'plugin/notes/notes.js', async: true},
+            {
+                src: 'plugin/highlight/highlight.js', async: true, callback: function () {
+                hljs.initHighlightingOnLoad();
+            }
+            }
+        ]
+    });
+</script>
+</body>
 </html>
