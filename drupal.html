@@ -1,0 +1,563 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>reveal.js</title>
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <!--<link rel="stylesheet" href="css/theme/moon.css">-->
+     <link rel="stylesheet" href="css/theme/night.css">
+
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+
+    <style type="text/css">
+        .reveal section img.img-raw {
+            background: none;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
+
+
+        <section><h1>Drupal & Docker</h1>
+
+        </section>
+
+        <section>
+            <h1>about</h1>
+
+        </section>
+
+        <section>
+
+            <section>
+                <h1>Drupal</h1>
+            </section>
+            <section>
+
+                <p>Drupal c'est...</p>
+
+                <p class="fragment">...du code PHP, une base SQL,
+                <br>et des fichiers</p>
+
+                <aside class="notes">
+                    classique
+                    * code PHP
+                    * Base SQL
+                    * fichiers utilisateurs (uploads)
+                </aside>
+            </section>
+
+            <section>
+
+                <img src="media/drupal-architecture.svg">
+
+
+                <aside class="notes">
+                    => schema Code, PHP, Apache, Mysql, Files puis memecache, solr, varnish
+                </aside>
+            </section>
+
+
+        </section>
+
+        <section>
+            <section>
+
+                <h1>Docker</h1>
+
+                <p  class="fragment">Déploiement et exécution d'applications</p>
+
+                <ul>
+                    <li class="fragment">Isolation</li>
+                    <li class="fragment">Distribution</li>
+                </ul>
+
+
+                <aside class="notes">
+
+                    Docker facilite le déploiement et l'exécution d'application
+                    Deux aspects de l'outils : l'isolation des applications tournant
+                    sur un meme serveur et la distributions d'application
+                    via une méthode de packaging
+
+                </aside>
+
+            </section>
+
+            <section>
+                <h2>Isolation</h2>
+
+                <p>Linux CGroups</p>
+
+                <ul>
+                    <li class="fragment">Isole un groupe de processus</li>
+                    <li class="fragment">Système de fichier (~chroot)</li>
+                    <li class="fragment">Réseau</li>
+                    <li class="fragment">...</li>
+                </ul>
+
+                <p class="fragment">Sur une même machine, en partageant le même noyau.</p>
+
+                <aside class="notes">
+                    Docker exploite les CGroups
+                    schéma VM vs container ?
+                    chaque application peut avoir ses propres
+                    bibliothèques système, utiliser les mêmes ports
+
+                    et autre : limiter CPU, RAM, uid séparés...
+
+                    noyau partagé : comme VM mais avec moins de surcoût
+                </aside>
+
+            </section>
+
+            <section>
+                <h2>Images Docker</h2>
+
+                <p class="fragment">Permettent de regrouper dans un seul ensemble :</p>
+
+                <ul>
+                    <li class="fragment">Bibliothèques de base ("OS")</li>
+                    <li class="fragment">Dépendances de l'application</li>
+                    <li class="fragment">Code de l'application</li>
+                </ul>
+
+                <p class="fragment">et le distribuer en lui donnant un nom :</p>
+                <p class="fragment"><code>group/name:tag</code></p>
+
+                <aside class="notes">
+                    nommage : group optionnel : société/projet
+                    nom
+                    tag : versionning => peu etre une version fixe
+                    ou un nom de branche
+                </aside>
+
+            </section>
+
+            <section>
+                <h2>Cycle complet</h2>
+
+
+                <ol >
+                    <li class="fragment">build</li>
+                    <li class="fragment">push</li>
+                    <li class="fragment">pull</li>
+                    <li class="fragment">run</li>
+                </ol>
+
+                <img class="img-raw" src="media/docker-build-chain.svg" type="image/svg+xml">
+
+
+                <p>
+                    <span class="fragment">Dev / CI</span>
+                    <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                    <span class="fragment">Run&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                </p>
+
+                <aside class="notes">
+
+                    Schéma
+                    (dev)
+                    [CI] => GIT => docker build => image => docker push => registry
+                    [SRV] => docker pull => image => docker run => container
+
+                </aside>
+
+            </section>
+
+            <section>
+                <h2>Démo !</h2>
+                <p>docker run</p>
+            </section>
+
+        </section>
+
+
+        <section>
+
+            <section>
+                <h1>Drupal + Docker</h1>
+            </section>
+
+            <section>
+                <p>Contenu de l'image docker</p>
+                <ul>
+                    <li class="fragment">Le système de base ("L'OS")</li>
+                    <li class="fragment">Apache<span class="fragment">, PHP</span><span class="fragment">, les modules PHP</span></li>
+                    <li class="fragment">Le code du projet Drupal</li>
+                    <li class="fragment"><span class="fragment strike">MySQL</span></li>
+                </ul>
+                <p class="fragment">MySQL: service externe</p>
+                <p class="fragment">comme memcached, Solr, Varnish, ...</p>
+
+                <aside class="notes">
+                    Que met on dans l'image ?
+                    Que mettrait-on sur un serveur ?
+                    - OS
+                    - PHP, Apache
+                    - Les modules PHP
+
+                    - mysql => service externe
+                    - juste le code, PHP, et un serveur Web
+
+                    mysql = service fourni par ailleurs (cluster classique, service "cloud" ou container séparé)
+                </aside>
+
+            </section>
+
+            <section>
+                <img src="media/drupal-architecture2.svg">
+
+            </section>
+
+            <section>
+
+                <p>Debian + Apache + PHP 5.6</p>
+
+                <em class="fragment">There's an image for that</em>
+                <p class="fragment"><code>library/php:5.6-apache</code></p>
+
+                <strong>ajouter notion d'image parente</strong>
+
+                <aside class="notes">
+                    Notion d'image parente
+                </aside>
+
+
+
+            </section>
+
+            <section>
+
+                <h2>Dockerfile</h2>
+
+                <p class="fragment">La recette de cuisine de l'image</p>
+
+                <p class="fragment">Similaire à un script shell</p>
+
+
+
+            </section>
+
+            <section>
+
+                <p>Dockerfile : les commandes</p>
+
+                <ul>
+                <li class="fragment"><code>FROM [image]</code></li>
+                <li class="fragment"> <code>RUN [cmd]</code></li>
+                <li class="fragment"><code>ADD</code> ou <code>COPY [source] [destination]</code></p>
+                </ul>
+            </section>
+
+            <section>
+                <h1>Démo !</h1>
+                <p>docker build</p>
+            </section>
+        </section>
+
+        <section>
+
+            <section>
+                <h1>docker-compose</h1>
+            </section>
+
+            <section>
+                <h3>docker-compose</h3>
+
+                <ul>
+                    <li>...</li>
+                </ul>
+
+                <aside class="notes">
+                  => "orchestration"
+                    Une application est rarement constitué d'un seul container
+                    Paramétrer le container via la ligne de commande est fastidieux
+                    compose: mécanisme déclaratif pour configurer un ou plusieurs container qui constituent
+                    une application
+                    analogue à Vagrant pour définir des VM
+                </aside>
+            </section>
+            <section>
+                <h1>Démo !</h1>
+                <p>docker-compose up</p>
+
+                <aside class="notes">
+                    exemple de docker-compose drupal/mysql
+                    image drupal précédente
+                    image mysql => variable d'env pour configurer
+                    docker-compose up
+                    logs => database, password
+                </aside>
+            </section>
+
+
+        </section>
+
+        <section>
+            <section>
+                <h1>Stockage</h1>
+            </section>
+
+            <section>
+                <p>Situations qui mènent à la création d'un nouveau container</p>
+                <ul>
+                    <li class="fragment">Mise à jour</li>
+                    <li class="fragment">Déplacement vers un autre host docker </li>
+                    <li class="fragment">Une erreur...</li>
+                </ul>
+
+                <p class="fragment">A retenir : un container est éphémère</p>
+
+                <aside class="notes">
+
+                    un tag GIT => une version de l'image, redémarrage pour mettre à jour
+
+                </aside>
+
+            </section>
+
+            <section>
+                <p>Petite question :</p>
+
+                <p class="fragment">Qu'arrive t'il à <code>site/default/files</code> ?</p>
+
+                <p class="fragment">et à <code>settings.php</code> ?</p>
+
+                <p class="fragment">Réponse : ils sont perdus !</p>
+
+                <aside class="notes">
+
+                    le stockage s'est fait sur la base de l'image précédente, dans le FS de premier container
+
+                </aside>
+
+            </section>
+
+            <section>
+                <p>Solution : les volumes Docker</p>
+
+                <p class="fragment">Dossier ou fichier,<br>
+
+                <span class="fragment">déclaré dans le Dockerfile,<br></span>
+                    <span class="fragment">ou à l'exécution du container.</span></span>
+                <p class="fragment">Montage vers un stockage externe au container.</p>
+
+                <aside class="notes">
+                    - fichier ou dossier déclaré dans le dockerfile (dans l'image) ou à l'exécution
+                    - en général montage vers un dossier/fichier sur le filesystem de l'host docker
+                </aside>
+
+            </section>
+
+            <section>
+                <p>ajout au Dockerfile</p>
+                <p><code>VOLUME /.../sites/default</code></p>
+            </section>
+
+            <section>
+                <p>ajout au docker-compose.yml</p>
+                <p style="text-align: left"><code >volumes:
+                     <br>- [chemin local]:/.../sites/default</code></p>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h1>Configuration</h1>
+            </section>
+
+            <section>
+                extrait docker compose mysql
+                <aside class="notes">
+                    -> exemple de mysql, configuré via l'environnement
+                    -> appliqué à drupal getenv() dans settings.php, drushrc.php, ...
+                </aside>
+            </section>
+
+            <section>
+                settings.php modifié
+                <aside class="notes">
+                    settings.php récupère les settings de mysql via l'environnemnt
+                </aside>
+            </section>
+
+            <section>
+                docker-compose.yml modifié
+                <aside class="notes">
+                    docker injecte l'environnement
+                    settings.php peut faire partie de l'image
+                    limte le volume à sites/default/files
+                </aside>
+            </section>
+
+            <section>
+                bonus: drushrc.php générique pour l'uri dans drush uli
+            </section>
+
+        </section>
+
+        <section>
+            <section>
+                <h1>Industrialisation</h1>
+            </section>
+
+            <section>
+                <p>Image de base</p>
+
+                <ul>
+                  <li class="fragment">Structure en couche</li>
+                  <li class="fragment">Image de base</li>
+                </ul>
+
+                <p class="fragment">(dockerfile)</p>
+            </section>
+
+            <section>
+              <object data="media/image-density.svg" type="image/svg+xml">
+
+              </object>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h1>Développement</h1>
+            </section>
+
+            <section>
+                <p>Pourquoi ?</p>
+                <ul>
+                    <li class="fragment strike">Rien à installer</li>
+                    <li class="fragment">Docker</li>
+                    <li class="fragment">Docker-compose</li>
+                    <li class="fragment">Git</li>
+                </ul>
+
+                <p class="fragment">C'est tout !</p>
+                <p class="fragment"><code>docker pull drupal-base</code></p>
+
+                <aside class="notes">
+                    Le reste des outils PHP, Apache, drush, composer, ... est dans l'image docker
+                    -> déjà préparée par "le sysadmin"
+                    -> réutilisable
+                    -> utilisation de l'image de base commune au projets pour avoir une parité dev/prod
+                </aside>
+
+            </section>
+
+            <section>
+                <p>Ctrl+S / Ctrl+R</p>
+                <p>docker build systématique devient fastidieux</p>
+
+                <aside class="notes">
+
+                    en PHP, on a l'habitude de sauvegarder et de recharger le navigateur
+                    fabriquer une image docker
+
+                </aside>
+            </section>
+
+            <section>
+                <p>Solution : les volumes</p>
+                <p>"Monter" les sources dans le container</p>
+
+                SCHEMA
+            </section>
+
+            <section>
+                <p>docker compose de dev</p>
+            </section>
+
+        </section>
+
+        <section>
+            <section>
+                <h1>Installer docker</h1>
+            </section>
+
+            <section>
+                <p>Facile !</p>
+            </section>
+            <section>
+                <p>Ajouter le repository</p>
+                <pre>echo "deb https://apt.dockerproject.org/repo debian-jessie main" \
+  >> /etc/apt/sources.list.d/docker.list</pre>
+            </section>
+            <section>
+                <p>Importer la clé GPG</p>
+                <pre>apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 \
+  --recv-keys 58118E89F3A912897C070ADBF76221572C52609D</pre>
+            </section>
+            <section>
+                <p>Et installer</p>
+                <pre>apt-get update && apt-get install git docker-engine -y</pre>
+            </section>
+            <section>
+                <p>docker-compose : binaire</p>
+                <code>https://github.com/docker/compose/releases</code>
+            </section>
+
+            <section>
+                <p>Windows & MacOS...</p>
+
+                <p class="fragment">Une VM VirtualBox avec debian</p>
+
+                <p class="fragment">ou <code>docker-toolbox</code></p>
+
+                <p class="fragment">ou Docker for Windows et Docker for Mac<br>
+                <span class="fragment">Unikernel et en beta</span> </p>
+
+            </section>
+
+        </section>
+
+        <section>
+            <h1>Merci !</h1>
+
+            ...
+        </section>
+
+    </div>
+</div>
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.js"></script>
+
+<script>
+    // More info https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        history: true,
+
+        // More info https://github.com/hakimel/reveal.js#dependencies
+        dependencies: [
+            {src: 'plugin/markdown/marked.js'},
+            {src: 'plugin/markdown/markdown.js'},
+            {src: 'plugin/notes/notes.js', async: true},
+            {
+                src: 'plugin/highlight/highlight.js', async: true, callback: function () {
+                hljs.initHighlightingOnLoad();
+            }
+            }
+        ]
+    });
+</script>
+</body>
+</html>
