@@ -29,9 +29,9 @@
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:snap-grids="false"
-     inkscape:window-width="1023"
+     inkscape:window-width="836"
      inkscape:window-height="776"
-     inkscape:window-x="653"
+     inkscape:window-x="840"
      inkscape:window-y="54"
      inkscape:window-maximized="0"
      fit-margin-top="0"
@@ -153,10 +153,9 @@
          id="tspan3197"
          sodipodi:role="line">debian</tspan></text>
     <path
-       transform="translate(0,308.2677)"
        inkscape:connector-curvature="0"
        id="path3199"
-       d="m 480,384.09448 0,-94.28571"
+       d="m 480,602.52919 0,94.28571"
        style="fill:none;stroke:#ffffff;stroke-width:3.79999995;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:url(#Arrow2Lstarty);marker-end:none" />
     <text
        xml:space="preserve"

@@ -199,7 +199,7 @@
             </section>
 
             <section>
-                <h2>Démo !</h2>
+                <h2>⌨ Démo !</h2>
                 <p>docker run</p>
 
                 <aside class="notes">
@@ -293,10 +293,29 @@
             </section>
 
             <section>
-                <h1>Démo !</h1>
+                <h1>⌨ Démo !</h1>
                 <p>docker build</p>
             </section>
+
+            <section>
+
+                <h3>Industrialisation</h3>
+
+                <p>Réutilisation de l'image pour d'autres projets.</p>
+
+                <p>Fabrication d'une image de base</p>
+
+            </section>
+
+            <section>
+
+                <img src="media/base-image.svg" class="img-raw">
+
+            </section>
+
         </section>
+
+
 
         <section>
 
@@ -338,7 +357,7 @@ services:
 
             </section>
             <section>
-                <h1>Démo !</h1>
+                <h1>⌨ Démo !</h1>
                 <p>docker-compose up</p>
 
                 <aside class="notes">
@@ -551,7 +570,7 @@ mysql:
             </section>
 
         </section>
-
+<!--
         <section>
             <section>
                 <h1>Industrialisation</h1>
@@ -574,6 +593,8 @@ mysql:
               </object>
             </section>
         </section>
+
+        -->
 
         <section>
             <section>
@@ -604,7 +625,7 @@ mysql:
             </section>
 
             <section>
-                <p>Ctrl+S / Ctrl+R</p>
+                <p>Ctrl+S, Ctrl+R, ↻</p>
                 <p class="fragment"><code>docker build</code> systématique devient fastidieux</p>
 
                 <aside class="notes">
@@ -618,12 +639,37 @@ mysql:
             <section>
                 <p>Solution : les volumes</p>
                 <p>"Monter" les sources dans le container</p>
-
-                SCHEMA
             </section>
 
             <section>
-                <p>docker compose de dev</p>
+                <p>docker-compose.yml</p>
+
+<pre>version: "2"
+services:
+
+  web:
+    image: lune/dev-drupal
+    ports:
+      - 3012:80
+    environment:
+      DRUPAL_URI: http://172.17.0.1:3012/
+      MYSQL_ENV_MYSQL_USER: drupal
+      MYSQL_ENV_MYSQL_PASSWORD: eeJa7Ahy
+      MYSQL_ENV_MYSQL_DATABASE: drupal
+    volumes:
+      - ./www:/var/www/html
+      - ./etc/web/memory.ini:/usr/local/etc/php/conf.d/memory.ini
+      - ./etc/web/date.ini:/usr/local/etc/php/conf.d/date.ini
+  mysql:
+    image: mysql:5.6
+    environment:
+      MYSQL_ROOT_PASSWORD: wf1sf49s89
+      MYSQL_USER: drupal
+      MYSQL_PASSWORD: eeJa7Ahy
+      MYSQL_DATABASE: drupal
+    volumes:
+      - ./var/compose/mysql:/var/lib/mysql</pre>
+
             </section>
 
         </section>
@@ -634,26 +680,26 @@ mysql:
             </section>
 
             <section>
-                <p>Facile !</p>
+                <p>Facile...</p>
 
                 <ul>
-                    <li>Packages</li>
+                    <li>Packages pour distributions</li>
                     <li>Binaires</li>
                 </ul>
 
-                <p>Sous Linux</p>
+                <p class="fragment">...sous Linux</p>
             </section>
 
 
             <section>
                 <p>Windows & MacOS...</p>
 
-                <p class="fragment">Une VM VirtualBox avec debian</p>
+                <p>Une VM VirtualBox avec debian</p>
 
-                <p class="fragment">ou <code>docker-toolbox</code></p>
+                <p class="fragment">→ <code>docker-toolbox</code></p>
 
                 <p class="fragment">ou Docker for Windows et Docker for Mac<br>
-                <span class="fragment">Beta, à base d'unikernel</span> </p>
+                <span class="fragment">Binaire "unikernel", en bêta</span> </p>
 
             </section>
 
