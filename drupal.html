@@ -316,20 +316,23 @@
             <section>
                 <h3>docker-compose.yml</h3>
 
-<pre># Image drupal
-drupal:
-  image: mydrupal:1
-  ports:
-    - 8080:80
-  restart: "always"
+<pre>version: "2"
+services:
+  # Image drupal
+  drupal:
+    image: mydrupal
+    ports:
+      - 9000:80
+    restart: "always"
 
-# MySQL server
-mysql:
-  image: mysql:5.6
-  environment:
-    MYSQL_USER: drupal
-    MYSQL_PASSWORD: s3cur3
-    MYSQL_DATABASE: drupal</pre>
+  # MySQL server
+  mysql:
+    image: mysql:5.6
+    environment:
+      MYSQL_USER: drupal
+      MYSQL_PASSWORD: s3cur3
+      MYSQL_DATABASE: drupal
+      MYSQL_ROOT_PASSWORD: r34llys3cur3</pre>
 
 
 
@@ -594,6 +597,8 @@ mysql:
                     -> déjà préparée par "le sysadmin"
                     -> réutilisable
                     -> utilisation de l'image de base commune au projets pour avoir une parité dev/prod
+                    -> on n'altere pas son environnement/OS de base
+                    -> on peut utiliser des versions différentes sur chaque projet
                 </aside>
 
             </section>
