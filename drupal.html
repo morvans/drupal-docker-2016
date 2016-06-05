@@ -27,6 +27,7 @@
         .reveal section img.img-raw {
             background: none;
             border: none;
+            box-shadow: none;
         }
     </style>
 </head>
@@ -66,7 +67,7 @@
 
             <section>
 
-                <img src="media/drupal-architecture.svg">
+                <img class="img-raw" src="media/drupal-architecture.svg">
 
 
                 <aside class="notes">
@@ -143,6 +144,10 @@
                 <p class="fragment"><code>group/name:tag</code></p>
 
                 <aside class="notes">
+
+                    - bibliotheques de base = organisation générale du FS
+                    plutot debian ? plutot redhat ?
+
                     nommage : group optionnel : société/projet
                     nom
                     tag : versionning => peu etre une version fixe
@@ -183,8 +188,27 @@
             </section>
 
             <section>
+
+                <p>Les images sont structurées en couche</p>
+
+                <p class="fragment">Une image stocke les modifications
+                apportées à une image parente</p>
+
+                <img class="fragment img-raw" src="media/image-layers.svg">
+
+            </section>
+
+            <section>
                 <h2>Démo !</h2>
                 <p>docker run</p>
+
+                <aside class="notes">
+                    - executer debian/ubuntu
+                    - montrer ps afux
+                    - montrer eth0
+                    - installer un package
+                </aside>
+
             </section>
 
         </section>
@@ -194,6 +218,7 @@
 
             <section>
                 <h1>Drupal + Docker</h1>
+                <p class="fragment">Fabrication d'une image</p>
             </section>
 
             <section>
@@ -201,6 +226,7 @@
                 <ul>
                     <li class="fragment">Le système de base ("L'OS")</li>
                     <li class="fragment">Apache<span class="fragment">, PHP</span><span class="fragment">, les modules PHP</span></li>
+                    <li class="fragment">Drush, Composer & co</li>
                     <li class="fragment">Le code du projet Drupal</li>
                     <li class="fragment"><span class="fragment strike">MySQL</span></li>
                 </ul>
@@ -213,6 +239,7 @@
                     - OS
                     - PHP, Apache
                     - Les modules PHP
+                    - Les outils : drush, composer
 
                     - mysql => service externe
                     - juste le code, PHP, et un serveur Web
@@ -223,7 +250,7 @@
             </section>
 
             <section>
-                <img src="media/drupal-architecture2.svg">
+                <img class="img-raw" src="media/drupal-architecture2.svg">
 
             </section>
 
@@ -234,15 +261,13 @@
                 <em class="fragment">There's an image for that</em>
                 <p class="fragment"><code>library/php:5.6-apache</code></p>
 
-                <strong>ajouter notion d'image parente</strong>
-
                 <aside class="notes">
-                    Notion d'image parente
+                    Image parente
                 </aside>
 
-
-
             </section>
+
+
 
             <section>
 
@@ -263,7 +288,7 @@
                 <ul>
                 <li class="fragment"><code>FROM [image]</code></li>
                 <li class="fragment"> <code>RUN [cmd]</code></li>
-                <li class="fragment"><code>ADD</code> ou <code>COPY [source] [destination]</code></p>
+                <li class="fragment"><code>ADD</code> ou <code>COPY [source] [destination]</code></li>
                 </ul>
             </section>
 
@@ -277,23 +302,37 @@
 
             <section>
                 <h1>docker-compose</h1>
-            </section>
-
-            <section>
-                <h3>docker-compose</h3>
-
-                <ul>
-                    <li>...</li>
-                </ul>
-
+                <p class="fragment">Orchestration</p>
                 <aside class="notes">
-                  => "orchestration"
+                    => "orchestration"
                     Une application est rarement constitué d'un seul container
                     Paramétrer le container via la ligne de commande est fastidieux
                     compose: mécanisme déclaratif pour configurer un ou plusieurs container qui constituent
                     une application
                     analogue à Vagrant pour définir des VM
                 </aside>
+            </section>
+
+            <section>
+                <h3>docker-compose.yml</h3>
+
+<pre># Image drupal
+drupal:
+  image: mydrupal:1
+  ports:
+    - 8080:80
+  restart: "always"
+
+# MySQL server
+mysql:
+  image: mysql:5.6
+  environment:
+    MYSQL_USER: drupal
+    MYSQL_PASSWORD: s3cur3
+    MYSQL_DATABASE: drupal</pre>
+
+
+
             </section>
             <section>
                 <h1>Démo !</h1>
@@ -317,11 +356,11 @@
             </section>
 
             <section>
-                <p>Situations qui mènent à la création d'un nouveau container</p>
+                <p>Situations qui amènent à recréer un container</p>
                 <ul>
-                    <li class="fragment">Mise à jour</li>
+                    <li class="fragment">Mise à jour (nouvelle image)</li>
                     <li class="fragment">Déplacement vers un autre host docker </li>
-                    <li class="fragment">Une erreur...</li>
+                    <li class="fragment">Changement de configuration</li>
                 </ul>
 
                 <p class="fragment">A retenir : un container est éphémère</p>
@@ -368,24 +407,62 @@
             </section>
 
             <section>
-                <p>ajout au Dockerfile</p>
-                <p><code>VOLUME /.../sites/default</code></p>
+                <p>Commande Dockerfile</p>
+                <p class="fragment"><code>VOLUME [path]</code></p>
+
+                <p class="fragment">Déclare le chemin du container dont le stockage doit être externe</p>
+
+                <p class="fragment"><code>VOLUME /var/www/html/sites/default</code></p>
+
+
             </section>
 
             <section>
-                <p>ajout au docker-compose.yml</p>
+                <p>docker-compose.yml</p>
                 <p style="text-align: left"><code >volumes:
-                     <br>- [chemin local]:/.../sites/default</code></p>
+                     <br>- ./site_default:/var/www/html/sites/default</code></p>
+
+                <aside class="notes">
+
+                    on conserve ainsi les fichiers et settings.php
+
+                </aside>
+
+
             </section>
         </section>
 
         <section>
             <section>
                 <h1>Configuration</h1>
+                <p>&Agrave; la mode des 12 facteurs</p>
             </section>
 
             <section>
-                extrait docker compose mysql
+
+                <p><code>settings.php</code> fait maintenant partie des données.</p>
+
+                <aside class="notes">
+                    Pourquoi pas bien ?
+                </aside>
+
+                </section>
+
+            <section>
+
+                <p>&laquo;Store config in the environment&raquo;</p>
+
+                <p class="fragment"><em>The Twelve-factor app &mdash; III. Config</em></p>
+
+                <p class="fragment">http://12factor.net/config</p>
+
+<pre class="fragment"># MySQL server
+mysql:
+  image: mysql:5.6
+  environment:
+    MYSQL_USER: drupal
+    MYSQL_PASSWORD: s3cur3
+    MYSQL_DATABASE: drupal</pre>
                 <aside class="notes">
                     -> exemple de mysql, configuré via l'environnement
                     -> appliqué à drupal getenv() dans settings.php, drushrc.php, ...
@@ -393,7 +470,44 @@
             </section>
 
             <section>
-                settings.php modifié
+                settings.php statique
+                <pre>$databases = array (
+  'default' =>
+  array (
+    'default' =>
+    array (
+      'database' => 'drupal',
+      'username' => 'drupal',
+      'password' => 's3cur3,
+      'host' => 'mysql',
+      'port' => '',
+      'driver' => 'mysql',
+      'prefix' => '',
+    ),
+  ),
+);</pre>
+                <aside class="notes">
+                    settings.php configuré par l'installeur
+                </aside>
+            </section>
+
+            <section>
+                settings.php injecté
+                <pre>$databases = array (
+  'default' =>
+  array (
+    'default' =>
+    array (
+      'database' => getenv('MYSQL_DATABASE'),
+      'username' => getenv('MYSQL_USER'),
+      'password' => getenv('MYSQL_PASSWORD'),
+      'host' => getenv('MYSQL_HOST'),
+      'port' => '',
+      'driver' => 'mysql',
+      'prefix' => '',
+    ),
+  ),
+);</pre>
                 <aside class="notes">
                     settings.php récupère les settings de mysql via l'environnemnt
                 </aside>
@@ -401,6 +515,27 @@
 
             <section>
                 docker-compose.yml modifié
+
+                <pre># Image drupal
+drupal:
+  image: mydrupal:1
+  ports:
+    - 8080:80
+  restart: "always"
+  environment:
+    MYSQL_USER: drupal
+    MYSQL_PASSWORD: s3cur3
+    MYSQL_DATABASE: drupal
+    MYSQL_HOST: mysql
+
+# MySQL server
+mysql:
+  image: mysql:5.6
+  environment:
+    MYSQL_USER: drupal
+    MYSQL_PASSWORD: s3cur3
+    MYSQL_DATABASE: drupal</pre>
+
                 <aside class="notes">
                     docker injecte l'environnement
                     settings.php peut faire partie de l'image
@@ -465,7 +600,7 @@
 
             <section>
                 <p>Ctrl+S / Ctrl+R</p>
-                <p>docker build systématique devient fastidieux</p>
+                <p class="fragment"><code>docker build</code> systématique devient fastidieux</p>
 
                 <aside class="notes">
 
@@ -495,25 +630,15 @@
 
             <section>
                 <p>Facile !</p>
+
+                <ul>
+                    <li>Packages</li>
+                    <li>Binaires</li>
+                </ul>
+
+                <p>Sous Linux</p>
             </section>
-            <section>
-                <p>Ajouter le repository</p>
-                <pre>echo "deb https://apt.dockerproject.org/repo debian-jessie main" \
-  >> /etc/apt/sources.list.d/docker.list</pre>
-            </section>
-            <section>
-                <p>Importer la clé GPG</p>
-                <pre>apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 \
-  --recv-keys 58118E89F3A912897C070ADBF76221572C52609D</pre>
-            </section>
-            <section>
-                <p>Et installer</p>
-                <pre>apt-get update && apt-get install git docker-engine -y</pre>
-            </section>
-            <section>
-                <p>docker-compose : binaire</p>
-                <code>https://github.com/docker/compose/releases</code>
-            </section>
+
 
             <section>
                 <p>Windows & MacOS...</p>
@@ -523,7 +648,7 @@
                 <p class="fragment">ou <code>docker-toolbox</code></p>
 
                 <p class="fragment">ou Docker for Windows et Docker for Mac<br>
-                <span class="fragment">Unikernel et en beta</span> </p>
+                <span class="fragment">Beta, à base d'unikernel</span> </p>
 
             </section>
 
