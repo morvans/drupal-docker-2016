@@ -335,7 +335,7 @@
             <section>
                 <h3>docker-compose.yml</h3>
 
-<pre>version: "2"
+<pre><code>version: "2"
 services:
   # Image drupal
   drupal:
@@ -351,7 +351,7 @@ services:
       MYSQL_USER: drupal
       MYSQL_PASSWORD: s3cur3
       MYSQL_DATABASE: drupal
-      MYSQL_ROOT_PASSWORD: r34llys3cur3</pre>
+      MYSQL_ROOT_PASSWORD: r34llys3cur3</code></pre>
 
 
 
@@ -441,8 +441,25 @@ services:
 
             <section>
                 <p>docker-compose.yml</p>
-                <p style="text-align: left"><code >volumes:
-                     <br>- ./site_default:/var/www/html/sites/default</code></p>
+                <pre><code class="yml" data-noescape="">version: "2"
+services:
+  # Image drupal
+  drupal:
+    image: mydrupal
+    ports:
+      - 9000:80
+    restart: "always"
+    <mark>volumes:</mark>
+      <mark>- ./site_default:/var/www/html/sites/default</mark>
+
+  # MySQL server
+  mysql:
+    image: mysql:5.6
+    environment:
+      MYSQL_USER: drupal
+      MYSQL_PASSWORD: s3cur3
+      MYSQL_DATABASE: drupal
+      MYSQL_ROOT_PASSWORD: r34llys3cur3</code></pre>
 
                 <aside class="notes">
 
@@ -478,13 +495,13 @@ services:
 
                 <p class="fragment">http://12factor.net/config</p>
 
-<pre class="fragment"># MySQL server
+<pre class="fragment"><code># MySQL server
 mysql:
   image: mysql:5.6
   environment:
     MYSQL_USER: drupal
     MYSQL_PASSWORD: s3cur3
-    MYSQL_DATABASE: drupal</pre>
+    MYSQL_DATABASE: drupal</code></pre>
                 <aside class="notes">
                     -> exemple de mysql, configuré via l'environnement
                     -> appliqué à drupal getenv() dans settings.php, drushrc.php, ...
@@ -493,7 +510,8 @@ mysql:
 
             <section>
                 settings.php statique
-                <pre>$databases = array (
+                <pre><code  class="php5">&lt;?php
+$databases = array (
   'default' =>
   array (
     'default' =>
@@ -507,7 +525,7 @@ mysql:
       'prefix' => '',
     ),
   ),
-);</pre>
+);</code></pre>
                 <aside class="notes">
                     settings.php configuré par l'installeur
                 </aside>
@@ -515,59 +533,71 @@ mysql:
 
             <section>
                 settings.php injecté
-                <pre>$databases = array (
+                <pre><code class="php5" data-noescape>&lt;?php
+$databases = array (
   'default' =>
   array (
     'default' =>
     array (
-      'database' => getenv('MYSQL_DATABASE'),
-      'username' => getenv('MYSQL_USER'),
-      'password' => getenv('MYSQL_PASSWORD'),
-      'host' => getenv('MYSQL_HOST'),
+      <mark>'database' => getenv('MYSQL_DATABASE'),</mark>
+      <mark>'username' => getenv('MYSQL_USER'),</mark>
+      <mark>'password' => getenv('MYSQL_PASSWORD'),</mark>
+      <mark>'host' => getenv('MYSQL_HOST'),</mark>
       'port' => '',
       'driver' => 'mysql',
       'prefix' => '',
     ),
   ),
-);</pre>
+);</code></pre>
                 <aside class="notes">
                     settings.php récupère les settings de mysql via l'environnemnt
                 </aside>
             </section>
 
             <section>
+                <h3>drushrc.php</h3>
+<pre><code class="php5">&lt;?php
+$options['uri'] = getenv('DRUPAL_URI');
+$options['sites-subdir'] = 'default';
+</code></pre>
+
+
+                <aside class="speaker-notes">bonus: drushrc.php générique pour l'uri dans drush uli</aside>
+            </section>
+
+            <section>
                 docker-compose.yml modifié
 
-                <pre># Image drupal
+                <pre><code data-noescape># Image drupal
 drupal:
   image: mydrupal:1
+  <mark>environment:</mark>
+    <mark>DRUPAL_URI: 'http://localhost:9000'</mark>
+    <mark>MYSQL_USER: drupal</mark>
+    <mark>MYSQL_PASSWORD: s3cur3</mark>
+    <mark>MYSQL_DATABASE: drupal</mark>
+    <mark>MYSQL_HOST: mysql</mark>
   ports:
-    - 8080:80
+    - 9000:80
   restart: "always"
-  environment:
-    MYSQL_USER: drupal
-    MYSQL_PASSWORD: s3cur3
-    MYSQL_DATABASE: drupal
-    MYSQL_HOST: mysql
-
+  volumes:
+      <mark>- ./site_default/files:/var/www/html/sites/default/files</mark>
 # MySQL server
 mysql:
   image: mysql:5.6
   environment:
     MYSQL_USER: drupal
     MYSQL_PASSWORD: s3cur3
-    MYSQL_DATABASE: drupal</pre>
+    MYSQL_DATABASE: drupal</code></pre>
 
                 <aside class="notes">
                     docker injecte l'environnement
-                    settings.php peut faire partie de l'image
+                    settings.php peut etre sous GIT et faire partie de l'image Docker
                     limte le volume à sites/default/files
                 </aside>
             </section>
 
-            <section>
-                bonus: drushrc.php générique pour l'uri dans drush uli
-            </section>
+
 
         </section>
 <!--
@@ -611,7 +641,7 @@ mysql:
                 </ul>
 
                 <p class="fragment">C'est tout !</p>
-                <p class="fragment"><code>docker pull drupal-base</code></p>
+                <p class="fragment"><code>docker pull drupalbase</code></p>
 
                 <aside class="notes">
                     Le reste des outils PHP, Apache, drush, composer, ... est dans l'image docker
@@ -626,7 +656,7 @@ mysql:
 
             <section>
                 <p>Ctrl+S, Ctrl+R, ↻</p>
-                <p class="fragment"><code>docker build</code> systématique devient fastidieux</p>
+                <p class="fragment">Le <code>docker build</code> systématique devient fastidieux</p>
 
                 <aside class="notes">
 
@@ -637,38 +667,33 @@ mysql:
             </section>
 
             <section>
-                <p>Solution : les volumes</p>
+                <p>Solution : encore les volumes</p>
                 <p>"Monter" les sources dans le container</p>
             </section>
 
             <section>
                 <p>docker-compose.yml</p>
 
-<pre>version: "2"
+<pre><code class="yml" data-noescape>version: "2"
 services:
-
   web:
     image: lune/dev-drupal
     ports:
       - 3012:80
     environment:
-      DRUPAL_URI: http://172.17.0.1:3012/
+      DRUPAL_URI: 'http://172.17.0.1:3012/'
       MYSQL_ENV_MYSQL_USER: drupal
       MYSQL_ENV_MYSQL_PASSWORD: eeJa7Ahy
       MYSQL_ENV_MYSQL_DATABASE: drupal
-    volumes:
-      - ./www:/var/www/html
-      - ./etc/web/memory.ini:/usr/local/etc/php/conf.d/memory.ini
-      - ./etc/web/date.ini:/usr/local/etc/php/conf.d/date.ini
+    <mark>volumes:</mark>
+      <mark>- ./www:/var/www/html</mark>
   mysql:
     image: mysql:5.6
     environment:
       MYSQL_ROOT_PASSWORD: wf1sf49s89
       MYSQL_USER: drupal
       MYSQL_PASSWORD: eeJa7Ahy
-      MYSQL_DATABASE: drupal
-    volumes:
-      - ./var/compose/mysql:/var/lib/mysql</pre>
+      MYSQL_DATABASE: drupal</code></pre>
 
             </section>
 
@@ -708,7 +733,9 @@ services:
         <section>
             <h1>Merci !</h1>
 
-            ...
+            <h3>Des questions ?</h3>
+
+            <small class="fragment"><small>Ici la Lune recrute</small></small>
         </section>
 
     </div>
