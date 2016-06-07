@@ -6,6 +6,10 @@
 
     <title>reveal.js</title>
 
+    <script src="lib/js/term.js"></script>
+    <script src="lib/js/tty-player.js"></script>
+
+
     <link rel="stylesheet" href="css/reveal.css">
     <!--<link rel="stylesheet" href="css/theme/moon.css">-->
      <link rel="stylesheet" href="css/theme/night.css">
@@ -13,6 +17,9 @@
 
     <!-- Theme used for syntax highlighting of code -->
     <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <link rel="stylesheet" href="lib/css/tty-player.css">
+
 
     <!-- Printing and PDF exports -->
     <script>
@@ -29,6 +36,19 @@
             border: none;
             box-shadow: none;
         }
+
+        tty-player {
+
+            line-height: normal;
+            font-family: monospace;
+            font-size: 0.5em;
+
+        }
+
+        tty-player .title {
+            display: none;
+        }
+
     </style>
 </head>
 <body>
@@ -321,6 +341,7 @@
             <section>
                 <h1>⌨ Démo !</h1>
                 <p>docker build</p>
+                <tty-player cols="80" row="25" src="demo/docker-build.ttyrec" controls="true"></tty-player>
             </section>
 
             <section>
