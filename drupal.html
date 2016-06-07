@@ -59,13 +59,36 @@
 
 
         <section><h1>Drupal & Docker</h1>
+            <h3>Simon Morvan</h3>
 
+            <p>
+                <code>https://www.drupal.org/u/garphy<br>@simonmorvan</code>
+
+            </p>
+            <br><br>
+            <p>
+                <img class="img-raw" src="media/ill-logo-white-01.svg" width="50%"/>
+                <br>
+                <a href="http://www.icilalune.com/">http://www.icilalune.com/</a>
+            </p>
         </section>
 
+        <!--
         <section>
-            <h1>about</h1>
+            <h1>Simon Morvan</h1>
 
+            <p>
+            <code>https://www.drupal.org/u/garphy &ndash; @simonmorvan</code>
+
+            </p>
+            <br><br>
+            <p>
+            <img class="img-raw" src="media/ill-logo-white-01.svg" width="50%"/>
+            <br>
+            <a href="http://www.icilalune.com/">http://www.icilalune.com/</a>
+            </p>
         </section>
+        -->
 
         <section>
             <h1>Pourquoi ?</h1>
@@ -74,6 +97,7 @@
                 <li class="fragment">Parité<br><small>&laquo;ça marche chez moi !&raquo;</small></li>
                 <li class="fragment">Conflits de version<br><small>PHP 5.x ou PHP7</small></li>
                 <li class="fragment">Sécurité et densité<br><small>Isolation sur un même serveur</small></li>
+                <li class="fragment">Requirements minimaux<br><small>Hosting</small></li>
             </ul>
 
         </section>
@@ -136,7 +160,7 @@
             </section>
 
             <section>
-                <h2>Isolation</h2>
+                <h2>Containers</h2>
 
                 <p>Linux CGroups</p>
 
@@ -341,8 +365,7 @@
             </section>
 
             <section>
-                <h1>⌨ Démo !</h1>
-                <p>docker build</p>
+                <h1>⌨ docker build</h1>
                 <tty-player id="ttyDemo" cols="80" row="25" src="demo/docker-build.ttyrec" controls="true"></tty-player>
                 <span class="fragment" id="ttyDemoFragment"></span>
             </section>
@@ -407,8 +430,7 @@ services:
 
             </section>
             <section>
-                <h1>⌨ Démo !</h1>
-                <p>docker-compose up</p>
+                <h1>⌨ docker-compose up</h1>
 
                 <aside class="notes">
                     exemple de docker-compose drupal/mysql
@@ -828,11 +850,13 @@ services:
         ]
     });
 
-    Reveal.addEventListener( 'fragmentshown', function( event ) {
-        if(event.fragment.id == "ttyDemoFragment"){
-            document.getElementById('ttyDemo').play();
+    Reveal.addEventListener('fragmentshown', function (event) {
+        if (event.fragment.id == "ttyDemoFragment") {
+            var player = document.getElementById('ttyDemo')
+            player.playbackRate = 4;
+            player.play();
         }
-    } );
+    });
 
 </script>
 </body>
