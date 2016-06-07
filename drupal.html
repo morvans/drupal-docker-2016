@@ -46,6 +46,17 @@
         </section>
 
         <section>
+            <h1>Pourquoi ?</h1>
+
+            <ul>
+                <li class="fragment">Parité<br><small>&laquo;ça marche chez moi !&raquo;</small></li>
+                <li class="fragment">Conflits de version<br><small>PHP 5.x ou PHP7</small></li>
+                <li class="fragment">Sécurité et densité<br><small>Isolation sur un même serveur</small></li>
+            </ul>
+
+        </section>
+
+        <section>
 
             <section>
                 <h1>Drupal</h1>
@@ -199,8 +210,23 @@
             </section>
 
             <section>
-                <h2>⌨ Démo !</h2>
-                <p>docker run</p>
+                <h2>⌨ docker run</h2>
+                <pre><code>root@debian-jessie:~# docker run -ti centos:7 /bin/bash
+[root@90d24805dacb /]# ps ax
+  PID TTY      STAT   TIME COMMAND
+    1 ?        Ss     0:00 /bin/bash
+   13 ?        R+     0:00 ps ax
+</code></pre>
+
+                <pre><code>root@debian-jessie:~# ps afx
+  PID TTY      STAT   TIME COMMAND
+    1 ?        Ss     0:00 /sbin/init
+(...)
+  429 ?        Ssl    0:03 /usr/bin/docker daemon -H fd://
+  474 ?        Ssl    0:00  \_ docker-containerd -l /var/run/docker/libcontainerd/docker-c
+ 1263 ?        Sl     0:00      \_ docker-containerd-shim 90d24805dacb0a389f163f9811e2df20
+ 1275 pts/2    Ss+    0:00          \_ /bin/bash
+</code></pre>
 
                 <aside class="notes">
                     - executer debian/ubuntu
@@ -320,8 +346,8 @@
         <section>
 
             <section>
-                <h1>docker-compose</h1>
-                <p class="fragment">Orchestration</p>
+                <h1>Orchestration</h1>
+                <p class="fragment">docker-compose</p>
                 <aside class="notes">
                     => "orchestration"
                     Une application est rarement constitué d'un seul container
