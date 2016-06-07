@@ -28,6 +28,8 @@
         link.type = 'text/css';
         link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
         document.getElementsByTagName('head')[0].appendChild(link);
+
+
     </script>
 
     <style type="text/css">
@@ -341,7 +343,8 @@
             <section>
                 <h1>⌨ Démo !</h1>
                 <p>docker build</p>
-                <tty-player cols="80" row="25" src="demo/docker-build.ttyrec" controls="true"></tty-player>
+                <tty-player id="ttyDemo" cols="80" row="25" src="demo/docker-build.ttyrec" controls="true"></tty-player>
+                <span class="fragment" id="ttyDemoFragment"></span>
             </section>
 
             <section>
@@ -824,6 +827,13 @@ services:
             }
         ]
     });
+
+    Reveal.addEventListener( 'fragmentshown', function( event ) {
+        if(event.fragment.id == "ttyDemoFragment"){
+            document.getElementById('ttyDemo').play();
+        }
+    } );
+
 </script>
 </body>
 </html>
