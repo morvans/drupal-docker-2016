@@ -59,6 +59,11 @@
 
 
         <section><h1>Drupal & Docker</h1>
+
+        </section>
+
+
+        <section>
             <h3>Simon Morvan</h3>
 
             <p>
@@ -73,34 +78,8 @@
             </p>
         </section>
 
-        <!--
-        <section>
-            <h1>Simon Morvan</h1>
 
-            <p>
-            <code>https://www.drupal.org/u/garphy &ndash; @simonmorvan</code>
 
-            </p>
-            <br><br>
-            <p>
-            <img class="img-raw" src="media/ill-logo-white-01.svg" width="50%"/>
-            <br>
-            <a href="http://www.icilalune.com/">http://www.icilalune.com/</a>
-            </p>
-        </section>
-        -->
-
-        <section>
-            <h1>Pourquoi ?</h1>
-
-            <ul>
-                <li class="fragment">Parité<br><small>&laquo;ça marche chez moi !&raquo;</small></li>
-                <li class="fragment">Conflits de version<br><small>PHP 5.x ou PHP7</small></li>
-                <li class="fragment">Sécurité et densité<br><small>Isolation sur un même serveur</small></li>
-                <li class="fragment">Requirements minimaux<br><small>Hosting</small></li>
-            </ul>
-
-        </section>
 
         <section>
 
@@ -243,8 +222,10 @@
                 </aside>
 
             </section>
-
+<!--
             <section>
+
+                <h2>Image layers</h2>
 
                 <p>Les images sont structurées en couche</p>
 
@@ -254,7 +235,7 @@
                 <img class="fragment img-raw" src="media/image-layers.svg">
 
             </section>
-
+-->
             <section>
                 <h2>⌨ docker run</h2>
                 <pre><code>root@debian-jessie:~# docker run -ti centos:7 /bin/bash
@@ -285,6 +266,18 @@
 
         </section>
 
+        <section>
+            <p>Drupal+Docker</p>
+            <h1>Pourquoi ?</h1>
+
+            <ul>
+                <li class="fragment">Parité<br><small>&laquo;ça marche chez moi !&raquo;</small></li>
+                <li class="fragment">Conflits de version<br><small>PHP 5.x ou PHP7</small></li>
+                <li class="fragment">Sécurité et densité<br><small>Isolation sur un même serveur</small></li>
+                <li class="fragment">Pré-requis minimes<br><small>Station développeur et/ou Hébergeur</small></li>
+            </ul>
+
+        </section>
 
         <section>
 
@@ -294,7 +287,7 @@
             </section>
 
             <section>
-                <p>Contenu de l'image docker</p>
+                <h3>Contenu de l'image docker</h3>
                 <ul>
                     <li class="fragment">Le système de base ("L'OS")</li>
                     <li class="fragment">Apache<span class="fragment">, PHP</span><span class="fragment">, les modules PHP</span></li>
@@ -355,7 +348,7 @@
 
             <section>
 
-                <p>Dockerfile : les commandes</p>
+                <h2>Dockerfile : les commandes</h2>
 
                 <ul>
                 <li class="fragment"><code>FROM [image]</code></li>
@@ -365,14 +358,82 @@
             </section>
 
             <section>
-                <h1>⌨ docker build</h1>
-                <tty-player id="ttyDemo" cols="80" row="25" src="demo/docker-build.ttyrec" controls="true"></tty-player>
-                <span class="fragment" id="ttyDemoFragment"></span>
+                <pre><code>FROM php:5.6-apache
+
+ADD docker/docker-php-pecl-install /usr/local/bin/
+
+RUN apt-get update && apt-get install -y \
+        git \
+        imagemagick \
+        libcurl4-openssl-dev \
+        libfreetype6-dev \
+        libjpeg-turbo-progs \
+        libjpeg62-turbo-dev \
+        libmcrypt-dev \
+        libpng12-dev \
+        libxml2-dev \
+        mysql-client \
+        pngquant \
+        ssmtp \
+        sudo \
+        unzip \
+        wget \
+        zlib1g-dev \
+    && docker-php-ext-install \
+        bcmath \
+        curl \
+        exif \
+        mbstring \
+        mcrypt \
+        mysql \
+        mysqli \
+        opcache \
+        pcntl \
+        pdo_mysql \
+        soap \
+        zip \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install gd \
+    && docker-php-pecl-install \
+        memcache \
+        uploadprogress \
+    && apt-get clean
+
+RUN echo "memory_limit = 256M" > /usr/local/etc/php/conf.d/custom.ini \
+    && echo "date.timezone='Europe/Paris'" >> /usr/local/etc/php/conf.d/custom.ini
+
+RUN cd /usr/local \
+    && curl -sS https://getcomposer.org/installer | php \
+    && chmod +x /usr/local/composer.phar \
+    && ln -s /usr/local/composer.phar /usr/local/bin/composer
+
+RUN cd /usr/local \
+    && git clone http://github.com/drush-ops/drush.git --branch master \
+    && cd /usr/local/drush \
+    && composer install \
+    && ln -s /usr/local/drush/drush /usr/bin/drush
+
+RUN a2enmod deflate \
+    && a2enmod expires \
+    && a2enmod headers \
+    && a2enmod mime \
+    && a2enmod rewrite
+
+ADD . /var/www/html/
+
+RUN chown -R www-data:www-data sites/default
+</code></pre>
             </section>
 
             <section>
+                <h2>⌨ docker build</h2>
+                <tty-player id="ttyDemo" cols="80" row="25" src="demo/docker-build.ttyrec" controls="true"></tty-player>
+                <span class="fragment" id="ttyDemoFragment"></span>
+            </section>
+<!--
+            <section>
 
-                <h3>Industrialisation</h3>
+                <h2>Industrialisation</h2>
 
                 <p>Réutilisation de l'image pour d'autres projets.</p>
 
@@ -385,15 +446,10 @@
                 <img src="media/base-image.svg" class="img-raw">
 
             </section>
-
-        </section>
-
-
-
-        <section>
+-->
 
             <section>
-                <h1>Orchestration</h1>
+                <h2>Orchestration</h2>
                 <p class="fragment">docker-compose</p>
                 <aside class="notes">
                     => "orchestration"
@@ -426,9 +482,11 @@ services:
       MYSQL_DATABASE: drupal
       MYSQL_ROOT_PASSWORD: r34llys3cur3</code></pre>
 
-
+<p class="fragment"><code># docker-compose up</code></p>
 
             </section>
+<!--
+
             <section>
                 <h1>⌨ docker-compose up</h1>
 
@@ -440,13 +498,14 @@ services:
                     logs => database, password
                 </aside>
             </section>
-
+-->
 
         </section>
 
         <section>
             <section>
                 <h1>Stockage</h1>
+                <p>(durable)</p>
             </section>
 
             <section>
@@ -468,13 +527,11 @@ services:
             </section>
 
             <section>
-                <p>Petite question :</p>
+                <p>Petite question...</p>
 
                 <p class="fragment">Qu'arrive t'il à <code>site/default/files</code> ?</p>
 
-                <p class="fragment">et à <code>settings.php</code> ?</p>
-
-                <p class="fragment">Réponse : ils sont perdus !</p>
+                <p class="fragment">Réponse : ils est perdu !</p>
 
                 <aside class="notes">
 
@@ -506,7 +563,7 @@ services:
 
                 <p class="fragment">Déclare le chemin du container dont le stockage doit être externe</p>
 
-                <p class="fragment"><code>VOLUME /var/www/html/sites/default</code></p>
+                <p class="fragment"><code>VOLUME /var/www/html/sites/default/files</code></p>
 
 
             </section>
@@ -522,7 +579,7 @@ services:
       - 9000:80
     restart: "always"
     <mark>volumes:</mark>
-      <mark>- ./site_default:/var/www/html/sites/default</mark>
+      <mark>- ./site-files:/var/www/html/sites/default/files</mark>
 
   # MySQL server
   mysql:
@@ -551,10 +608,13 @@ services:
 
             <section>
 
-                <p><code>settings.php</code> fait maintenant partie des données.</p>
+                <p><code>settings.php</code> fait partie du code.</p>
+                <p class="fragment">Variations par environnement ?</p>
 
                 <aside class="notes">
-                    Pourquoi pas bien ?
+                    Pourquoi ?
+                    => géré dans git
+                    => synchroniser les modifications de configuration au rythme des releases du projet
                 </aside>
 
                 </section>
@@ -563,9 +623,7 @@ services:
 
                 <p>&laquo;Store config in the environment&raquo;</p>
 
-                <p class="fragment"><em>The Twelve-factor app &mdash; III. Config</em></p>
-
-                <p class="fragment">http://12factor.net/config</p>
+                <p class="fragment"><em>The Twelve-factor app &mdash; III. Config</em><br>http://12factor.net/config</p>
 
 <pre class="fragment"><code># MySQL server
 mysql:
@@ -581,7 +639,7 @@ mysql:
             </section>
 
             <section>
-                settings.php statique
+                <h2>settings.php statique</h2>
                 <pre><code  class="php5">&lt;?php
 $databases = array (
   'default' =>
@@ -604,7 +662,7 @@ $databases = array (
             </section>
 
             <section>
-                settings.php injecté
+                <h2>settings.php dynamique</h2>
                 <pre><code class="php5" data-noescape>&lt;?php
 $databases = array (
   'default' =>
@@ -626,6 +684,7 @@ $databases = array (
                 </aside>
             </section>
 
+            <!--
             <section>
                 <h3>drushrc.php</h3>
 <pre><code class="php5">&lt;?php
@@ -636,9 +695,9 @@ $options['sites-subdir'] = 'default';
 
                 <aside class="speaker-notes">bonus: drushrc.php générique pour l'uri dans drush uli</aside>
             </section>
-
+-->
             <section>
-                docker-compose.yml modifié
+                <h2>docker-compose.yml</h2>
 
                 <pre><code data-noescape># Image drupal
 drupal:
@@ -653,7 +712,7 @@ drupal:
     - 9000:80
   restart: "always"
   volumes:
-      <mark>- ./site_default/files:/var/www/html/sites/default/files</mark>
+    - ./site-files:/var/www/html/sites/default/files
 # MySQL server
 mysql:
   image: mysql:5.6
@@ -704,7 +763,7 @@ mysql:
             </section>
 
             <section>
-                <p>Pourquoi ?</p>
+                <h2>Pourquoi ?</h2>
                 <ul>
                     <li class="fragment strike">Rien à installer</li>
                     <li class="fragment">Docker</li>
@@ -713,7 +772,9 @@ mysql:
                 </ul>
 
                 <p class="fragment">C'est tout !</p>
-                <p class="fragment"><code>docker pull drupalbase</code></p>
+                <p class="fragment"><code>docker pull dev-drupal</code></p>
+
+                <p class="fragment">PHP, Drush, Composer, Xdebug, ...</p>
 
                 <aside class="notes">
                     Le reste des outils PHP, Apache, drush, composer, ... est dans l'image docker
@@ -739,12 +800,13 @@ mysql:
             </section>
 
             <section>
-                <p>Solution : encore les volumes</p>
-                <p>"Monter" les sources dans le container</p>
+                <p>Les volumes à la rescousse</p>
+                <p>pour "monter" les sources dans le container</p>
             </section>
 
             <section>
-                <p>docker-compose.yml</p>
+                <h2>docker-compose.yml</h2>
+                <p>Developpement local</p>
 
 <pre><code class="yml" data-noescape>version: "2"
 services:
@@ -766,6 +828,8 @@ services:
       MYSQL_USER: drupal
       MYSQL_PASSWORD: drup4l
       MYSQL_DATABASE: drupal</code></pre>
+
+                <a href="https://hub.docker.com/r/lune/dev-drupal/">https://hub.docker.com/r/lune/dev-drupal/</a>
 
             </section>
 
@@ -802,19 +866,55 @@ services:
 
         </section>
 -->
+
         <section>
 
-            <h1></h1>
+            <section>
 
-            <ul>
-                <li></li>
-            </ul>
+                <h1></h1>
 
-            <aside class="notes">
+                <ul>
+                    <li></li>
+                </ul>
 
-                conclusion, rappel des avantages
+            </section>
 
-            </aside>
+            <section>
+                <h2>En bref</h2>
+
+                <p>Simplification :</p>
+
+                <ul>
+                    <li>du déploiement ;</li>
+                    <li>du développment.</li>
+                </ul>
+
+                <aside class="notes">
+
+                    conclusion, rappel des avantages
+
+                    simplification du déploiement : packaging des dépendances, distribution facilitée,
+                    maximisation du taux d'utilisation de l'infra mais isolation des applications
+
+                    dev: installation et maintenance facilitée des dépendances de dev nécessaires
+                    pas d'altération du système local
+
+                </aside>
+
+            </section>
+
+            <section>
+
+                <h2>Docker en 4 étape faciles</h2>
+
+                <ul>
+                    <li><code>docker build</code></li>
+                    <li><code>docker push</code></li>
+                    <li><code>docker pull</code></li>
+                    <li><code>docker-compose up</code></li>
+                </ul>
+
+            </section>
 
         </section>
 
@@ -823,7 +923,7 @@ services:
 
             <h3>Des questions ?</h3>
 
-            <small class="fragment"><small>Ici la Lune recrute</small></small>
+            <small class="fragment">Ici la Lune recrute</small>
         </section>
 
     </div>
