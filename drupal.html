@@ -12,7 +12,7 @@
 
     <link rel="stylesheet" href="css/reveal.css">
     <!--<link rel="stylesheet" href="css/theme/moon.css">-->
-     <link rel="stylesheet" href="css/theme/night.css">
+    <link rel="stylesheet" href="css/theme/night.css">
 
 
     <!-- Theme used for syntax highlighting of code -->
@@ -58,7 +58,16 @@
     <div class="slides">
 
 
-        <section><h1>Drupal & Docker</h1>
+        <section>
+            <h1>Drupal & Docker</h1>
+
+            <aside class="notes">
+                <ul>
+                    <li>questions ? qui utilise docker en prod ? en dev ?</li>
+                    <li>introduction à l'utilisation de docker pour un projet drupal</li>
+                    <li>audience à l'aise avec drupal, novice avec docker</li>
+                </ul>
+            </aside>
 
         </section>
 
@@ -76,28 +85,37 @@
                 <br>
                 <a href="http://www.icilalune.com/">http://www.icilalune.com/</a>
             </p>
+
+
+            <aside class="notes">
+                <ul>
+                    <li>presentation</li>
+                    <li>agence</li>
+                    <li>utilisateur de Drupal depuis ~9 ans</li>
+                    <li>utilisateur de Docker depuis ~3 ans</li>
+                    <li>Docker en prod depuis ~1.5 ans</li>
+                </ul>
+            </aside>
+
         </section>
-
-
 
 
         <section>
 
             <section>
                 <h1>Drupal</h1>
-            </section>
-            <section>
 
-                <p>Drupal c'est...</p>
+                <p class="fragment">c'est...</p>
 
                 <p class="fragment">...du code PHP, une base SQL,
-                <br>et des fichiers</p>
+                    <br>et des fichiers</p>
 
                 <aside class="notes">
-                    classique
-                    * code PHP
-                    * Base SQL
-                    * fichiers utilisateurs (uploads)
+                    <ul>
+                        <li>une Application PHP</li>
+                        <li>Base SQL</li>
+                        <li>fichiers utilisateurs (uploads)</li>
+                    </ul>
                 </aside>
             </section>
 
@@ -105,9 +123,14 @@
 
                 <img class="img-raw" src="media/drupal-architecture.svg">
 
-
                 <aside class="notes">
-                    => schema Code, PHP, Apache, Mysql, Files puis memecache, solr, varnish
+                    <ul>
+                        <li>Du code PHP, donc un environnement d'exécution PHP</li>
+                        <li>Un serveur Web, car application web</li>
+                        <li>Accès à un serveur de base de données</li>
+                        <li>Accès à un dossier de stockage</li>
+                        <li>Et des composants (optionels) souvent présents</li>
+                    </ul>
                 </aside>
             </section>
 
@@ -119,7 +142,7 @@
 
                 <h1>Docker</h1>
 
-                <p  class="fragment">Déploiement et exécution d'applications</p>
+                <p class="fragment">Déploiement et exécution d'applications</p>
 
                 <ul>
                     <li class="fragment">Isolation</li>
@@ -128,12 +151,16 @@
 
 
                 <aside class="notes">
-
-                    Docker facilite le déploiement et l'exécution d'application
-                    Deux aspects de l'outils : l'isolation des applications tournant
-                    sur un meme serveur et la distributions d'application
-                    via une méthode de packaging
-
+                    <ul>
+                        <li>Docker facilite le déploiement et l'exécution d'application</li>
+                        <li>Deux aspects princpaux à l'outil :
+                            <ul>
+                                <li>l'isolation des applications tournant sur un meme serveur</li>
+                                <li>la distributions d'application
+                                    via une méthode de packaging
+                                </li>
+                            </ul>
+                    </ul>
                 </aside>
 
             </section>
@@ -153,14 +180,18 @@
                 <p class="fragment">Sur une même machine, en partageant le même noyau.</p>
 
                 <aside class="notes">
-                    Docker exploite les CGroups
-                    schéma VM vs container ?
-                    chaque application peut avoir ses propres
-                    bibliothèques système, utiliser les mêmes ports
 
-                    et autre : limiter CPU, RAM, uid séparés...
+                    Pour l'isolation
+                    <ul>
+                        <li>Docker exploite les CGroups ~ "Containers" sous linux</li>
+                        <li>Isole les applications les unes des autres</li>
+                        <li>Fournit une vue séparée du système de fichier, permettant l'installation de dépendances propres à l'application</li>
+                        <li>Fournit une vue séparée du réseau, permettant aux application d'utiliser les mêmes ports, si besoin</li>
+                        <li>Autres : limiter le CPU, la RAM, ...</li>
+                    </ul>
 
-                    noyau partagé : comme VM mais avec moins de surcoût
+                    => Fonctionnalités d'une VM, mais en partageant le même noyau, donc avec moins de surcoût
+
                 </aside>
 
             </section>
@@ -181,13 +212,22 @@
 
                 <aside class="notes">
 
-                    - bibliotheques de base = organisation générale du FS
-                    plutot debian ? plutot redhat ?
+                    La distribution : les images docker.<br>
+                    Regroupent :
 
-                    nommage : group optionnel : société/projet
-                    nom
-                    tag : versionning => peu etre une version fixe
-                    ou un nom de branche
+                    <ul>
+                        <li>Base/OS : plutot debian ? plutot redhat ?</li>
+                        <li>Dépendances: logiciels et bibliothèques requises par l'application</li>
+                        <li>Le code de l'application</li>
+                    </ul>
+
+                    Nommage :
+                    <ul>
+                        <li>Un groupe (société, projet, ...)</li>
+                        <li>Un nom</li>
+                        <li>Un tag pour versionner les images</li>
+                    </ul>
+
                 </aside>
 
             </section>
@@ -196,7 +236,7 @@
                 <h2>Cycle complet</h2>
 
 
-                <ol >
+                <ol>
                     <li class="fragment">build</li>
                     <li class="fragment">push</li>
                     <li class="fragment">pull</li>
@@ -214,28 +254,27 @@
 
                 <aside class="notes">
 
-                    Schéma
-                    (dev)
-                    [CI] => GIT => docker build => image => docker push => registry
-                    [SRV] => docker pull => image => docker run => container
+                    GIT => docker build => image => docker push => registry
+                    <br>
+                    docker pull => image => docker run => container
 
                 </aside>
 
             </section>
-<!--
-            <section>
+            <!--
+                        <section>
 
-                <h2>Image layers</h2>
+                            <h2>Image layers</h2>
 
-                <p>Les images sont structurées en couche</p>
+                            <p>Les images sont structurées en couche</p>
 
-                <p class="fragment">Une image stocke les modifications
-                apportées à une image parente</p>
+                            <p class="fragment">Une image stocke les modifications
+                            apportées à une image parente</p>
 
-                <img class="fragment img-raw" src="media/image-layers.svg">
+                            <img class="fragment img-raw" src="media/image-layers.svg">
 
-            </section>
--->
+                        </section>
+            -->
             <section>
                 <h2>⌨ docker run</h2>
                 <pre><code>root@debian-jessie:~# docker run -ti centos:7 /bin/bash
@@ -256,10 +295,13 @@
 </code></pre>
 
                 <aside class="notes">
-                    - executer debian/ubuntu
-                    - montrer ps afux
-                    - montrer eth0
-                    - installer un package
+                    <ul>
+                        <li>Sur une Debian, on créé un container, basé sur un environnement CentOS</li>
+                        <li>dans lequel on lance un shell interactif Bash</li>
+                        <li>on remarque le prompt par défaut CentOS et le hostname qui change</li>
+                        <li>on voit qu'a l'intérieur du container, le processus principal (PID 1) est bash</li>
+                        <li>a l'extérieur de container, c'est un processus normal (PID 1275)</li>
+                    </ul>
                 </aside>
 
             </section>
@@ -271,11 +313,28 @@
             <h1>Pourquoi ?</h1>
 
             <ul>
-                <li class="fragment">Parité<br><small>&laquo;ça marche chez moi !&raquo;</small></li>
-                <li class="fragment">Conflits de version<br><small>PHP 5.x ou PHP7</small></li>
-                <li class="fragment">Sécurité et densité<br><small>Isolation sur un même serveur</small></li>
-                <li class="fragment">Pré-requis minimes<br><small>Station développeur et/ou Hébergeur</small></li>
+                <li class="fragment">Parité<br>
+                    <small>&laquo;ça marche chez moi !&raquo;</small>
+                </li>
+                <li class="fragment">Conflits de version<br>
+                    <small>PHP 5.x ou PHP7</small>
+                </li>
+                <li class="fragment">Sécurité et densité<br>
+                    <small>Isolation sur un même serveur</small>
+                </li>
+                <li class="fragment">Pré-requis minimes<br>
+                    <small>Station développeur et/ou Hébergeur</small>
+                </li>
             </ul>
+
+            <aside class="notes">
+                <ul>
+                    <li>Parité dev/prod</li>
+                    <li>Conflits de version, entre projets</li>
+                    <li>Densité accrue (moins de surcharge comme les VM) en assurant l'isolation des applications</li>
+                    <li>Prérequis d'exécution : Linux (récent) et Docker</li>
+                </ul>
+            </aside>
 
         </section>
 
@@ -290,7 +349,8 @@
                 <h3>Contenu de l'image docker</h3>
                 <ul>
                     <li class="fragment">Le système de base ("L'OS")</li>
-                    <li class="fragment">Apache<span class="fragment">, PHP</span><span class="fragment">, les modules PHP</span></li>
+                    <li class="fragment">Apache<span class="fragment">, PHP</span><span class="fragment">, les modules PHP</span>
+                    </li>
                     <li class="fragment">Drush, Composer & co</li>
                     <li class="fragment">Le code du projet Drupal</li>
                     <li class="fragment"><span class="fragment strike">MySQL</span></li>
@@ -300,16 +360,16 @@
 
                 <aside class="notes">
                     Que met on dans l'image ?
+                    <br>
                     Que mettrait-on sur un serveur ?
-                    - OS
-                    - PHP, Apache
-                    - Les modules PHP
-                    - Les outils : drush, composer
-
-                    - mysql => service externe
+                    <br>
+                    - mysql = service externe: Drupal a besoin de s'y connecter, pas de l'avoir le binaire
+                    <br>
+                    peut etre fourni par ailleurs (cluster classique, service "cloud" ou container séparé)
+                    <br>
                     - juste le code, PHP, et un serveur Web
 
-                    mysql = service fourni par ailleurs (cluster classique, service "cloud" ou container séparé)
+
                 </aside>
 
             </section>
@@ -333,7 +393,6 @@
             </section>
 
 
-
             <section>
 
                 <h2>Dockerfile</h2>
@@ -343,7 +402,6 @@
                 <p class="fragment">Similaire à un script shell</p>
 
 
-
             </section>
 
             <section>
@@ -351,9 +409,9 @@
                 <h2>Dockerfile : les commandes</h2>
 
                 <ul>
-                <li class="fragment"><code>FROM [image]</code></li>
-                <li class="fragment"> <code>RUN [cmd]</code></li>
-                <li class="fragment"><code>ADD</code> ou <code>COPY [source] [destination]</code></li>
+                    <li class="fragment"><code>FROM [image]</code></li>
+                    <li class="fragment"><code>RUN [cmd]</code></li>
+                    <li class="fragment"><code>ADD</code> ou <code>COPY [source] [destination]</code></li>
                 </ul>
             </section>
 
@@ -430,23 +488,23 @@ RUN chown -R www-data:www-data sites/default
                 <tty-player id="ttyDemo" cols="80" row="25" src="demo/docker-build.ttyrec" controls="true"></tty-player>
                 <span class="fragment" id="ttyDemoFragment"></span>
             </section>
-<!--
-            <section>
+            <!--
+                        <section>
 
-                <h2>Industrialisation</h2>
+                            <h2>Industrialisation</h2>
 
-                <p>Réutilisation de l'image pour d'autres projets.</p>
+                            <p>Réutilisation de l'image pour d'autres projets.</p>
 
-                <p>Fabrication d'une image de base</p>
+                            <p>Fabrication d'une image de base</p>
 
-            </section>
+                        </section>
 
-            <section>
+                        <section>
 
-                <img src="media/base-image.svg" class="img-raw">
+                            <img src="media/base-image.svg" class="img-raw">
 
-            </section>
--->
+                        </section>
+            -->
 
             <section>
                 <h2>Orchestration</h2>
@@ -482,23 +540,23 @@ services:
       MYSQL_DATABASE: drupal
       MYSQL_ROOT_PASSWORD: r34llys3cur3</code></pre>
 
-<p class="fragment"><code># docker-compose up</code></p>
+                <p class="fragment"><code># docker-compose up</code></p>
 
             </section>
-<!--
+            <!--
 
-            <section>
-                <h1>⌨ docker-compose up</h1>
+                        <section>
+                            <h1>⌨ docker-compose up</h1>
 
-                <aside class="notes">
-                    exemple de docker-compose drupal/mysql
-                    image drupal précédente
-                    image mysql => variable d'env pour configurer
-                    docker-compose up
-                    logs => database, password
-                </aside>
-            </section>
--->
+                            <aside class="notes">
+                                exemple de docker-compose drupal/mysql
+                                image drupal précédente
+                                image mysql => variable d'env pour configurer
+                                docker-compose up
+                                logs => database, password
+                            </aside>
+                        </section>
+            -->
 
         </section>
 
@@ -512,7 +570,7 @@ services:
                 <p>Situations qui amènent à recréer un container</p>
                 <ul>
                     <li class="fragment">Mise à jour (nouvelle image)</li>
-                    <li class="fragment">Déplacement vers un autre host docker </li>
+                    <li class="fragment">Déplacement vers un autre host docker</li>
                     <li class="fragment">Changement de configuration</li>
                 </ul>
 
@@ -546,7 +604,7 @@ services:
 
                 <p class="fragment">Dossier ou fichier,<br>
 
-                <span class="fragment">déclaré dans le Dockerfile,<br></span>
+                    <span class="fragment">déclaré dans le Dockerfile,<br></span>
                     <span class="fragment">ou à l'exécution du container.</span></span>
                 <p class="fragment">Montage vers un stockage externe au container.</p>
 
@@ -617,7 +675,7 @@ services:
                     => synchroniser les modifications de configuration au rythme des releases du projet
                 </aside>
 
-                </section>
+            </section>
 
             <section>
 
@@ -640,7 +698,7 @@ mysql:
 
             <section>
                 <h2>settings.php statique</h2>
-                <pre><code  class="php5">&lt;?php
+                <pre><code class="php5">&lt;?php
 $databases = array (
   'default' =>
   array (
@@ -729,33 +787,32 @@ mysql:
             </section>
 
 
-
         </section>
-<!--
-        <section>
-            <section>
-                <h1>Industrialisation</h1>
-            </section>
+        <!--
+                <section>
+                    <section>
+                        <h1>Industrialisation</h1>
+                    </section>
 
-            <section>
-                <p>Image de base</p>
+                    <section>
+                        <p>Image de base</p>
 
-                <ul>
-                  <li class="fragment">Structure en couche</li>
-                  <li class="fragment">Image de base</li>
-                </ul>
+                        <ul>
+                          <li class="fragment">Structure en couche</li>
+                          <li class="fragment">Image de base</li>
+                        </ul>
 
-                <p class="fragment">(dockerfile)</p>
-            </section>
+                        <p class="fragment">(dockerfile)</p>
+                    </section>
 
-            <section>
-              <object data="media/image-density.svg" type="image/svg+xml">
+                    <section>
+                      <object data="media/image-density.svg" type="image/svg+xml">
 
-              </object>
-            </section>
-        </section>
+                      </object>
+                    </section>
+                </section>
 
-        -->
+                -->
 
         <section>
             <section>
@@ -834,38 +891,38 @@ services:
             </section>
 
         </section>
-<!--
-        <section>
-            <section>
-                <h1>Installer docker</h1>
-            </section>
+        <!--
+                <section>
+                    <section>
+                        <h1>Installer docker</h1>
+                    </section>
 
-            <section>
-                <p>Facile...</p>
+                    <section>
+                        <p>Facile...</p>
 
-                <ul>
-                    <li>Packages pour distributions</li>
-                    <li>Binaires</li>
-                </ul>
+                        <ul>
+                            <li>Packages pour distributions</li>
+                            <li>Binaires</li>
+                        </ul>
 
-                <p class="fragment">...sous Linux</p>
-            </section>
+                        <p class="fragment">...sous Linux</p>
+                    </section>
 
 
-            <section>
-                <p>Windows & MacOS...</p>
+                    <section>
+                        <p>Windows & MacOS...</p>
 
-                <p>Une VM VirtualBox avec debian</p>
+                        <p>Une VM VirtualBox avec debian</p>
 
-                <p class="fragment">→ <code>docker-toolbox</code></p>
+                        <p class="fragment">→ <code>docker-toolbox</code></p>
 
-                <p class="fragment">ou Docker for Windows et Docker for Mac<br>
-                <span class="fragment">Binaire "unikernel", en bêta</span> </p>
+                        <p class="fragment">ou Docker for Windows et Docker for Mac<br>
+                        <span class="fragment">Binaire "unikernel", en bêta</span> </p>
 
-            </section>
+                    </section>
 
-        </section>
--->
+                </section>
+        -->
 
         <section>
 
